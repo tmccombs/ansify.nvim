@@ -8,11 +8,9 @@ local group = vim.api.nvim_create_augroup('ansify', {})
 --- count can be used to specify a different buffer
 vim.api.nvim_create_user_command('Ansify', function(opts)
   require'ansify'.ansify_buffer{
-    close = opts.bang,
     buffer = opts.count,
   }
 end, {
-  bang = true,
   count = 0,
   desc = 'Highlight ANSI termcodes in current buffer',
 })
@@ -23,7 +21,7 @@ vim.api.nvim_create_user_command('AnsiPage', function(opts)
   -- hide the status line, unless another window is opened
   vim.o.laststatus = 1
   vim.g.ansify_pager = true
-  local buf = require'ansify'.ansify_buffer{ close = true }
+  local buf = require'ansify'.ansify_buffer{}
 end, {
   desc = 'Helper for using nvim as a pager for content with ANSI escapes'
 })
@@ -33,6 +31,7 @@ vim.api.nvim_create_user_command('OpenAnsi', function(opts)
 end, {
   nargs = 1,
   desc = 'Open the given file, with ANSI escapes highlighted',
+  complete = 'file',
 })
 
 local augroup = vim.api.nvim_create_augroup('__ansify', {})
