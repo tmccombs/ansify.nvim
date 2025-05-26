@@ -17,7 +17,7 @@ local stream_to_channel = function(stream, chan, on_done)
         api.nvim_chan_send(chan, chunk)
       end)
     else
-      assert(uv.close(stream))
+      uv.close(stream)
       vim.schedule(on_done)
     end
   end)
@@ -53,8 +53,8 @@ end
 local fd_to_channel = function(fd, chan, on_done)
   local stat = uv.fs_fstat(fd)
   if stat.type == 'fifo' then
-    local pipe = uv.pipe_new(false)
-    pipe:open(fd)
+    local pipe = uv.new_pipe(false)
+    assert(uv.pipe_open(pipe, fd))
     stream_to_channel(pipe, chan, on_done)
   else
     file_to_channel(fd, chan, on_done)
