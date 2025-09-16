@@ -6,6 +6,11 @@ local M = {}
 
 M.file_prefix = "ansify://"
 
+--- How long to wait after writing to the channel before
+--- we expect the buffer and window to be updated.
+--- See https://github.com/neovim/neovim/issues/23360
+local wait_time = 20
+
 ---@param stream uv_stream_t Stream to copy
 ---@param chan integer Channel to write to
 ---@param on_done (fun(): any) Callback to call when everything has been copied
@@ -18,7 +23,7 @@ local stream_to_channel = function(stream, chan, on_done)
       end)
     else
       uv.close(stream)
-      vim.schedule(on_done)
+      vim.defer_fn(on_done, wait_time)
     end
   end)
 end
@@ -27,7 +32,6 @@ end
 ---@param chan integer Channel to write to
 ---@param on_done (fun(): any) Callback to call when everything has been copied
 local file_to_channel = function(file, chan, on_done)
-  print('Reading '..file)
   local bufsize = 4096
   local callback
   callback = function(err, chunk)
@@ -39,9 +43,8 @@ local file_to_channel = function(file, chan, on_done)
         uv.fs_read(file, bufsize, nil, callback)
       end)
     else
-      print('done')
       assert(uv.fs_close(file))
-      vim.schedule(on_done)
+      vim.defer_fn(on_done, wait_time)
     end
   end
   uv.fs_read(file, bufsize, nil, callback)
@@ -85,26 +88,31 @@ end
 
 ---@class BufOpts
 ---@field buffer? integer Buffer to use as the source. Defaults to current buffer
+---@field on_finish? (fun(): any) Callback to call after window has finished updating
 
 
 --- Process terminal escapes in the current buffer, and create a new terminal buffer based on that
 --- content.
 ---
----@param opts BufOpts
+---@param opts? BufOpts
 function  M.ansify_buffer(opts)
   -- TODO: make use of https://github.com/neovim/neovim/pull/33720
-  local buf = opts.buffer
-  if not src or src == 0 then
+  local buf = opts and opts.buffer
+  if not buf or buf == 0 then
     buf =  vim.api.nvim_get_current_buf()
   end
   -- TODO: just read lines, then delete them, and use the current buffer?
   local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+  vim.print(#lines)
   -- Delete the lines we just read
   api.nvim_buf_set_lines(buf, 0, -1, false, {})
   --local buf = api.nvim_create_buf(false, true)
   local term = create_term(buf)
   api.nvim_chan_send(term, table.concat(lines, "\n"))
-  api.nvim_exec_autocmds('BufRead', {buffer = buf })
+  vim.defer_fn(function()
+    api.nvim_exec_autocmds('BufRead', {buffer = buf })
+    opts.on_finish and opts.on_finish()
+  end, wait_time)
   return buf
 end
 
