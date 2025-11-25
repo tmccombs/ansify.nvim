@@ -130,6 +130,9 @@ function M.open(path)
 	api.nvim_win_set_buf(0, buf)
 end
 
+--- Hook for BufReadPre autocmd for ansify:// "files"
+---@param filename string ansify:// prefixed filename to load
+---@param buf ID of buffer to load the file in
 function M.buf_read(filename, buf)
 	api.nvim_exec_autocmds("BufReadPre", { buffer = buf })
 	local path = filename:match "^ansify://(.*)"
