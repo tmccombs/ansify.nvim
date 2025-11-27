@@ -94,23 +94,19 @@ the right position using the information in the `KITTY_PIPE_DATA` environment
 variable (see
 <https://sw.kovidgoyal.net/kitty/launch/#the-piping-environment>).
 
-For example:
-
->sh
-launch --stdin-source=@screen_scrollback --stdin-add-formatting nvim \
+For example: >sh
+    launch --stdin-source=@screen_scrollback --stdin-add-formatting nvim \
         -c 'lua require"ansify.kitty".from_env()'
-<
+
 Alternatively you can use the `ansify.sh` in the bin folder of this plugin,
 which wraps calling nvim. It takes three arguments, which it expects to be the
 values of the `@input-line-number`, `@cursor-x`, and `@cursor-y` special
 arguments.
 
-Fox example:
+Fox example: >sh
+    launch --stdin-source=@screen_scrollback --stdin-add-formatting \
+        $ANSIFY_PATH/bin/ansify.sh @input-line-number @cursor-x @cursor-y
 
->sh
-launch --stdin-source=@screen_scrollback --stdin-add-formatting \
-  $ANSIFY_PATH/bin/ansify.sh @input-line-number @cursor-x @cursor-y
-<
 This uses `require"ansify.kitty".scroll_to(first_line, cursor_y, cursor_x)`
 under th covers.
 
