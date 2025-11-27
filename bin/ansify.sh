@@ -11,4 +11,4 @@ if [[ $# -ne 3 ]]; then
     exit 1
 fi
 
-exec nvim -c "lua require'ansify.kitty'.scroll_to($1, $2, $3)"
+exec nvim -c "lua require'ansify.kitty'.scroll_to($1, $3, $2)"
