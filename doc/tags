@@ -1,0 +1,10 @@
+:AnsiPage	ansify.txt	/*:AnsiPage*
+:Ansify	ansify.txt	/*:Ansify*
+:OpenAnsi	ansify.txt	/*:OpenAnsi*
+ansify-kitty	ansify.txt	/*ansify-kitty*
+ansify.ansify_buffer()	ansify.txt	/*ansify.ansify_buffer()*
+ansify.nvim	ansify.txt	/*ansify.nvim*
+ansify.nvim-api	ansify.txt	/*ansify.nvim-api*
+ansify.open()	ansify.txt	/*ansify.open()*
+ansify.txt	ansify.txt	/*ansify.txt*
+ansify://	ansify.txt	/*ansify:\/\/*

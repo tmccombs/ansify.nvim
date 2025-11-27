@@ -1,0 +1,129 @@
+*ansify.txt*    Process ANSI escapes
+
+==============================================================================
+1. Overview                                     *ansify.nvim*
+
+This provide a simple and realtively minimal plugin for viewing content
+containing ANSI escape codes (such as colors) as intended within Neovim. It uses
+Neovim's terminal mode to process the escapes.
+
+This is particularly useful for using neovim as a pager for content that
+includes ANSI escapes, or for viewing the scrollback of a terminal such as kitty
+or wezterm.
+
+==============================================================================
+2. Commands
+
+*:Ansify*
+            Process the ANSI escapes in the current buffer in place.
+
+            This essentially converts the current buffer into a terminal buffer,
+            then sends the current content through the terminal, and allows
+            Neovim to output as if it had been sent to the terminal directly.
+
+            If a count is given, that is used as the id of the buffer to
+            convert, instead of the current one.
+
+            WARNING: This modifies the contents of the buffer. While it is
+            useful for paging, you may not want to save the resulting content
+            back to the original file.
+
+
+*:AnsiPage*
+
+            Similar to |:Ansify|, but perform some additional configuration
+            useful for use as a pager. In particular it hides the status line.
+            It also sets `g:ansify_pager` (`vim.g.ansify_pager`) to true.
+
+*:OpenAnsi* {filename}
+            Create a new terminal buffer, and send the contents of {filename}
+            to that terminal so that ANSI escapes will be processed.
+
+==============================================================================
+3. Lua API                                      *ansify.nvim-api*
+
+The following functions are exported by the `ansify` package (i.e. with
+`require'ansify'`).
+
+
+
+`ansify_buffer(opts)`                            *ansify.ansify_buffer()*
+        Process terminal escapes of contents of a buffer (defaults to current
+        buffer).
+
+        This modifies the buffer in place.
+
+        It is called by |:Ansify|.
+
+        opts has the form:
+        >lua
+        {
+          -- Buffer to process, defaults to current buffer,
+          buffer = 0,
+          -- Callback to call after processing is finished and the buffer
+          -- is ready
+          on_finish = function() end
+        }
+        <
+
+`open(path)`                                    *ansify.open()*
+        Open a file, while processing any ansi escpaes. `path` is the path of
+        the file to open.
+
+==============================================================================
+4. ansify:// files                              *ansify://*
+
+
+Editing a file of the form `ansify://<filepath>` is roughly equivalent to
+`:OpenAnsi <filepath>`. It will open the file in a terminal view with ANSI
+escapes processed.
+
+
+==============================================================================
+5. Kitty Support                                *ansify-kitty*
+
+This plugin includes basic support for using as a pager launched by  kitty
+with the `--stdin-source` and `--stdin-add-formatting` options.
+
+There are a couple of ways of using this.
+
+The simplest is probably to have
+kitty invoke `nvim` with `-c 'lua require"ansify.kitty".from_env()'`, which
+will process the escapes in the buffer (from stdin) and attempt to scroll to
+the right position using the information in the `KITTY_PIPE_DATA` environment
+variable (see
+<https://sw.kovidgoyal.net/kitty/launch/#the-piping-environment>).
+
+For example:
+
+>sh
+launch --stdin-source=@screen_scrollback --stdin-add-formatting nvim \
+        -c 'lua require"ansify.kitty".from_env()'
+<
+Alternatively you can use the `ansify.sh` in the bin folder of this plugin,
+which wraps calling nvim. It takes three arguments, which it expects to be the
+values of the `@input-line-number`, `@cursor-x`, and `@cursor-y` special
+arguments.
+
+Fox example:
+
+>sh
+launch --stdin-source=@screen_scrollback --stdin-add-formatting \
+  $ANSIFY_PATH/bin/ansify.sh @input-line-number @cursor-x @cursor-y
+<
+This uses `require"ansify.kitty".scroll_to(first_line, cursor_y, cursor_x)`
+under th covers.
+
+==============================================================================
+Acknowledgements
+
+
+- <https://github.com/neovim/neovim/issues/30415#issuecomment-2368519968>
+  for the start of the implementation, although this has added some additional
+  functionality
+- <https://github.com/kovidgoyal/kitty/issues/719>
+  for some ideas on how to handle kitty's scrollback buffer with neovim
+
+
+
+vim:tw=78:ts=8:sw=0:sts=4:et:ft=help:norl:
