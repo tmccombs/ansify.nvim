@@ -2,7 +2,6 @@ local group = vim.api.nvim_create_augroup("ansify", {})
 
 --- Ansify command
 --- Process current buffer.
---- Bang means delete the original buffer
 --- count can be used to specify a different buffer
 vim.api.nvim_create_user_command("Ansify", function(opts)
 	require("ansify").ansify_buffer {
