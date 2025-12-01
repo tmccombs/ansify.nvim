@@ -145,4 +145,17 @@ function M.buf_read(filename, buf)
 	end)
 end
 
+--- Like ansify_buffer, but use pager configuration.
+---
+--- Sets vim.g.ansify_pager to true.
+---
+---@param opts? BufOpts
+---@see ansify_buffer
+function M.pager(opts)
+	-- hide the status line, unless another window is opened
+	vim.o.laststatus = 1
+	vim.g.ansify_pager = true
+	M.ansify_buffer(opts)
+end
+
 return M

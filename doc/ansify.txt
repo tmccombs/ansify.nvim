@@ -70,6 +70,13 @@ The following functions are exported by the `ansify` package (i.e. with
         Open a file, while processing any ansi escpaes. `path` is the path of
         the file to open.
 
+`pager(opts)`                                   *ansify.pager()*
+        Like |ansify.ansify_buffer()| but also set some settings to work
+        better as a pager. This also sets `vim.g.ansify_pager` to true, for
+        use by other plugins or user code.
+
+        This is called by |:AnsiPage|.
+
 ==============================================================================
 4. ansify:// files                              *ansify://*
 

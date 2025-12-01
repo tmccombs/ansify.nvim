@@ -53,8 +53,11 @@ return {
 	---  Kitty's "@cursor-x"
 	---@see https://sw.kovidgoyal.net/kitty/launch/#special-arguments
 	scroll_to = function(first_line, y, x)
-		ansify.ansify_buffer()
-		navigate(first_line, y, x)
+		ansify.pager {
+			on_finish = function()
+				navigate(first_line, y, x)
+			end,
+		}
 	end,
 	--- Parse the KITTY_PIPE_DATA environment variable, and use it to determine
 	--- the proper scroll position for the buffer. Then Ansify the current buffer,
@@ -65,17 +68,15 @@ return {
 		if not data then
 			return
 		end
-		ansify.ansify_buffer {
+		ansify.pager {
 			on_finish = function()
 				vim.wo.scrolloff = 0
-				-- TODO: why doesn't this work
 				vim.cmd {
 					cmd = "normal",
 					bang = true,
 					-- Scroll to the bottom, then scroll up by "scrolled-by"
 					args = { "G" .. data.scrolled_by .. vim.keycode "<c-y>" },
 				}
-				-- TODO set cursor position
 			end,
 		}
 	end,

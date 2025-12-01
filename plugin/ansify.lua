@@ -15,10 +15,7 @@ end, {
 -- Similar to Ansify, but assumes this is used to open neovim as a pager
 -- for a single file (which may be stdin), and do some additional configuration
 vim.api.nvim_create_user_command("AnsiPage", function(opts)
-	-- hide the status line, unless another window is opened
-	vim.o.laststatus = 1
-	vim.g.ansify_pager = true
-	local buf = require("ansify").ansify_buffer {}
+	require("ansify").pager()
 end, {
 	desc = "Helper for using nvim as a pager for content with ANSI escapes",
 })
